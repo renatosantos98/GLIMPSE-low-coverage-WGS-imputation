@@ -12,7 +12,7 @@ coverage=1x
 mkdir -p seq/${coverage}
 
 for fastq1 in fastq/22*1PFW/clean_data/22*_1.fq.gz;
-    do fastq2=fastq/22*1PFW/clean_data/22*_2.fq.gz;
+    do fastq2=${fastq1%1.fq.gz}2.fq.gz;
     echo fastq1: ${fastq1};
     echo fastq2: ${fastq2};
     samoutput=${fastq1#"fastq/"};
