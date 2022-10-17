@@ -72,7 +72,14 @@ for finput in 1000G/*sites.vcf.gz;
 done
 
 # Prepare GLIMPSE Imputation Chunks
-chromosomes=( chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr19 chr20 chr21 chr22)
+chromosomes=( chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr19 chr20 chr21 chr22 )
+
 for region in "${chromosomes[@]}";
     do GLIMPSE_chunk --thread 16 --input 1000G/1000G.${region}.sites.vcf.gz --region ${region} --window-size 2000000 --buffer-size 200000 --output chunks/chunks.${region}.txt;
+done
+
+chromosomeX=( chrX:60001-2699520 chrX:2699521-154931043 chrX:154931044-155260560 )
+
+for region in "${chromosomeX[@]}";
+    do GLIMPSE_chunk --thread 16 --input 1000G/1000G.chrX.sites.vcf.gz --region ${region} --window-size 2000000 --buffer-size 200000 --output chunks/chunks.${region}.txt;
 done
