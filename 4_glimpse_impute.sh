@@ -10,19 +10,20 @@ threads=16
 # Chromosome 22 only
 chromosomes=( chr22 )
 
-# GLIMPSE_phase Imputation
-for SAMPLE in vcf/1x/*/;
-    do
+GLIMPSE_phase Imputation
+for SAMPLE in vcf/1x/*;
+    do echo sample: ${SAMPLE};
     for REGION in "${chromosomes[@]}";
-        do VCF=vcf/1x/${SAMPLE}/${REGION}.vcf.gz;
+        do VCF=${SAMPLE}/${REGION}.vcf.gz;
+        echo vcf: ${VCF};
         REF=1000G/1000G.${REGION}.bcf;
         MAP=maps/${REGION}.b37.gmap;
-        mkdir -p GLIMPSE_imputed/${SAMPLE}/${REGION};
+        mkdir -p GLIMPSE_imputed/${SAMPLE#"vcf/1x/"}/${REGION};
         while IFS="" read -r LINE || [ -n "$LINE" ];
             do printf -v ID "%02d" $(echo $LINE | cut -d" " -f1)
             IRG=$(echo $LINE | cut -d" " -f3)
             ORG=$(echo $LINE | cut -d" " -f4)
-            OUT=GLIMPSE_imputed/${SAMPLE}/${REGION}/${ID}.bcf
+            OUT=GLIMPSE_imputed/${SAMPLE#"vcf/1x/"}/${REGION}/${ID}.bcf
             GLIMPSE_phase --input ${VCF} --reference ${REF} --map ${MAP} --input-region ${IRG} --output-region ${ORG} --output ${OUT};
             bcftools index $threads -f ${OUT};
         done < chunks/chunks.${REGION}.txt;
@@ -30,12 +31,12 @@ for SAMPLE in vcf/1x/*/;
 done
 
 # Create list of imputed chunks for each chromosome and ligate them
-for SAMPLE in GLIMPSE_imputed/*/;
+for SAMPLE in GLIMPSE_imputed/*;
     do
     for REGION in "${chromosomes[@]}";
-        do ls GLIMPSE_imputed/${SAMPLE}/${REGION}/*.bcf > GLIMPSE_imputed/${SAMPLE}/${REGION}/list.txt;
-        mkdir -p GLIMPSE_ligated/${SAMPLE};
-        GLIMPSE_ligate --thread $threads --input GLIMPSE_imputed/${SAMPLE}/${REGION}/list.txt --output GLIMPSE_ligated/${SAMPLE}/${REGION}.merged.bcf;
-        bcftools index $threads -f GLIMPSE_ligated/${SAMPLE}/${REGION}.merged.bcf;
+        do ls ${SAMPLE}/${REGION}/*.bcf > ${SAMPLE}/${REGION}/list.txt;
+        mkdir -p GLIMPSE_ligated/${SAMPLE#"GLIMPSE_imputed/"};
+        GLIMPSE_ligate --thread ${threads} --input ${SAMPLE}/${REGION}/list.txt --output GLIMPSE_ligated/${SAMPLE#"GLIMPSE_imputed/"}/${REGION}.merged.bcf;
+        bcftools index --threads ${threads} -f GLIMPSE_ligated/${SAMPLE#"GLIMPSE_imputed/"}/${REGION}.merged.bcf;
     done;
 done

@@ -1,5 +1,5 @@
 # Calculates genotype likelihoods of low-coverage BAM files and stored them in VCF files.
-# Requires a 'samples.txt' file with the format:
+# To change sample names it requires a 'samples.txt' file with the format:
 # Old_sample_name New_sample_name
 # The two fields are separated by a space.
 # Especially important to ensure 1x and 30x vcf files have the same sample name on the header to run GLIMPSE_concordance.
@@ -18,16 +18,22 @@ chromosomes=( chr22 )
 
 # Calculation of genotype likelihoods
 for BAM in seq/${coverage}/*.bam;
-    do
+    do echo bam: ${BAM};
     for REGION in "${chromosomes[@]}";
         do VCF=1000G/1000G.${REGION}.sites.vcf.gz;
         TSV=1000G/1000G.${REGION}.sites.tsv.gz;
         REFGEN=reference/hg19.fa;
-        mkdir -p vcf/${coverage}/${BAM%.bam};
-        OUT=vcf/${coverage}/${BAM%.bam}/${REGION}.vcf.gz;
-        echo Calling ${REGION} of ${BAM%.bam}...;
-        bcftools mpileup --threads $threads -f ${REFGEN} -I -E -a 'FORMAT/DP' -T ${VCF} -r ${REGION} ${BAM} -Ou | bcftools reheader --threads $threads -s samples.txt | bcftools call --threads $threads --ploidy GRCh37 -Aim -C alleles -T ${TSV} -Oz -o ${OUT};
-        echo Indexing ${BAM%.bam}...;
+        SAMPLE=${BAM#"seq/"${coverage}"/"};
+        SAMPLE=${SAMPLE%.bam};
+        echo sample: ${SAMPLE};
+        mkdir -p vcf/${coverage}/${SAMPLE};
+        OUT=vcf/${coverage}/${SAMPLE}/${REGION}.vcf.gz;
+        echo Calling ${REGION} of ${SAMPLE}...;
+        # Without reheader so sample names are unchanged.
+        bcftools mpileup --threads $threads -f ${REFGEN} -I -E -a 'FORMAT/DP' -T ${VCF} -r ${REGION} ${BAM} -Ou | bcftools call --threads $threads --ploidy GRCh37 -Aim -C alleles -T ${TSV} -Oz -o ${OUT};
+        # With reheader to change sample names.
+        # bcftools mpileup --threads $threads -f ${REFGEN} -I -E -a 'FORMAT/DP' -T ${VCF} -r ${REGION} ${BAM} -Ou | bcftools reheader --threads $threads -s samples.txt | bcftools call --threads $threads --ploidy GRCh37 -Aim -C alleles -T ${TSV} -Oz -o ${OUT};
+        echo Indexing ${SAMPLE}...;
         bcftools index --threads $threads -f ${OUT};
     done;
 done
