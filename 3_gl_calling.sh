@@ -29,10 +29,27 @@ for BAM in seq/${coverage}/*.bam;
         mkdir -p vcf/${coverage}/${SAMPLE};
         OUT=vcf/${coverage}/${SAMPLE}/${REGION}.vcf.gz;
         echo Calling ${REGION} of ${SAMPLE}...;
-        # Without reheader so sample names are unchanged.
         bcftools mpileup --threads $threads -f ${REFGEN} -I -E -a 'FORMAT/DP' -T ${VCF} -r ${REGION} ${BAM} -Ou | bcftools call --threads $threads --ploidy GRCh37 -Aim -C alleles -T ${TSV} -Oz -o ${OUT};
-        # With reheader to change sample names.
-        # bcftools mpileup --threads $threads -f ${REFGEN} -I -E -a 'FORMAT/DP' -T ${VCF} -r ${REGION} ${BAM} -Ou | bcftools reheader --threads $threads -s samples.txt | bcftools call --threads $threads --ploidy GRCh37 -Aim -C alleles -T ${TSV} -Oz -o ${OUT};
+        echo Indexing ${SAMPLE}...;
+        bcftools index --threads $threads -f ${OUT};
+    done;
+done
+
+chromosomeX=( chrX:60001-2699520 chrX:2699521-154931043 chrX:154931044-155260560 )
+
+for BAM in seq/${coverage}/*.bam;
+    do echo bam: ${BAM};
+    for REGION in "${chromosomeX[@]}";
+        do VCF=1000G/1000G.chrX.sites.vcf.gz;
+        TSV=1000G/1000G.chrX.sites.tsv.gz;
+        REFGEN=reference/hg19.fa;
+        SAMPLE=${BAM#"seq/"${coverage}"/"};
+        SAMPLE=${SAMPLE%.bam};
+        echo sample: ${SAMPLE};
+        mkdir -p vcf/${coverage}/${SAMPLE};
+        OUT=vcf/${coverage}/${SAMPLE}/${REGION}.vcf.gz;
+        echo Calling ${REGION} of ${SAMPLE}...;
+        bcftools mpileup --threads $threads -f ${REFGEN} -I -E -a 'FORMAT/DP' -T ${VCF} -r ${REGION} ${BAM} -Ou | bcftools call --threads $threads --ploidy GRCh37 -Aim -C alleles -T ${TSV} -Oz -o ${OUT};
         echo Indexing ${SAMPLE}...;
         bcftools index --threads $threads -f ${OUT};
     done;
