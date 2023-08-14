@@ -1,6 +1,6 @@
 # Low-coverage whole genome sequencing for a highly selective cohort of severe COVID-19 patients
 
-#### by Renato Santos, Víctor Moreno-Torres, Ilduara Pintos, Carmen de Mendoza, Octavio Corral, Vicente Soriano, and Manuel Corpas
+[![Shell Language Badge](https://img.shields.io/badge/shell_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)](https://www.linux.org/) [![Code style: Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=for-the-badge)](https://prettier.io/) [![Python Language Badge](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/) [![Code style: Black](https://img.shields.io/badge/code%20style-black-000000.svg?style=for-the-badge)](https://black.readthedocs.io/en/stable/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE.md)
 
 This repository contains the scripts used in Santos et al. **Low-coverage whole genome sequencing for a highly selective cohort of severe COVID-19 patients**. Supporting data, including validation files and patient clinical histories, are archived in our [Figshare collection](https://doi.org/10.25452/figshare.plus.c.6347534). Genetic data for the patient cohort can be found in our EGA study. This repository will remain open for support with reproducibility and issues.
 
@@ -41,7 +41,7 @@ A copy of the repository is also archived at [doi.org/10.25452/figshare.plus.216
 
 You'll need a working Python environment to run the code. We recommend you set up your environment through [Anaconda](https://www.anaconda.com/download/), which provides the `conda` package manager.
 
-Run the following command in the main repository folder (where ([`environment.yml`](environment.yml)) is located) to create a conda environment and install all required dependencies in it.
+Run the following command in the main repository folder (where [`environment.yml`](environment.yml) is located) to create a conda environment and install all required dependencies in it.
 
 ```
 conda env create -f environment.yml
