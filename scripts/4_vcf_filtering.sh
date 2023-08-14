@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Filters variants in VCF files for MAF and INFO quality scores.
+# Filters variants in VCF files for MAF and FORMAT/GP scores.
 
 # Change to use a different number of CPU threads.
 threads=16

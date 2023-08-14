@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # All scripts are expected to run from the base level directory, above "scripts/" (i.e., "../scripts").
-# Creates the conda environment, installs the required tools, and prepares a genome reference, imputation reference panel, and imputation chunks.
+# Prepares the imputation reference panel and imputation chunks.
 
 # Change to use a different number of CPU threads.
 threads=16

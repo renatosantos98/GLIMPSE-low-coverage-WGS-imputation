@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Calculates genotype likelihoods of low-coverage BAM files and stores them in VCF files.
+# Calculates genotype likelihoods of low-coverage CRAM files and stores them in VCF files.
 # To change sample names it requires a 'samples.txt' file in the scripts folder with the format:
 # "Old_sample_name" "New_sample_name"
 # The two fields are separated by a space.
@@ -8,7 +8,7 @@
 # Change to use a different number of CPU threads.
 threads=16
 
-# Change 1x to 30x for high-coverage files. Used to organise validation files into different coverage levels.
+# Used to organise validation files into different coverage levels.
 coverage=1x
 
 # Calculation of genotype likelihoods
@@ -51,7 +51,7 @@ do for PLATFORM in bgi illumina;
                 REFGEN=/mnt/e/Sarek/references/Homo_sapiens/GATK/GRCh37/Sequence/WholeGenomeFasta/human_g1k_v37_decoy.fasta;
                 OUT=vcf/${coverage}/${SAMPLE}/${PLATFORM}/${REGION}.vcf.gz;
                 echo Calling chromosome ${REGION} of ${SAMPLE}...;
-                bcftools mpileup --threads ${threads} -f ${REFGEN} -I -E -a 'FORMAT/DP' -T ${VCF} -r ${REGION} ${BAM} -Ou | bcftools reheader --threads ${threads} -s samples.txt | bcftools call --threads ${threads} --ploidy GRCh37 -S ploidy.txt -Aim -C alleles -T ${TSV} -Oz -o ${OUT};
+                bcftools mpileup --threads ${threads} -f ${REFGEN} -I -E -a 'FORMAT/DP' -T ${VCF} -r ${REGION} ${BAM} -Ou | bcftools reheader --threads ${threads} -s scripts/lib/samples.txt | bcftools call --threads ${threads} --ploidy GRCh37 -S ploidy.txt -Aim -C alleles -T ${TSV} -Oz -o ${OUT};
                 echo Indexing ${OUT}...;
                 bcftools index --threads 4 -f ${OUT};
             done;
