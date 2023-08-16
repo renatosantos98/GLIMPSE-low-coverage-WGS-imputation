@@ -54,42 +54,14 @@ for chr in {1..22}; do
       --out IBS.chr"${chr}".phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes
 done
 
-# Prune variants from each chromosome by MAF and VIF
-cd ..
-for chr in {1..22}; do
-    plink --noweb \
-      --bfile raw/ALL.chr"${chr}".phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes \
-      --maf 0.10 --indep 50 5 1.5 \
-      --out pruned/ALL/ALL.chr"${chr}".phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes
-
-    plink --noweb \
-      --bfile raw/ALL.chr"${chr}".phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes \
-      --extract pruned/ALL/ALL.chr"${chr}".phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.prune.in \
-      --make-bed \
-      --out pruned/ALL/ALL.chr"${chr}".phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes
-
-    plink --noweb \
-      --bfile raw/IBS.chr"${chr}".phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes \
-      --maf 0.10 --indep 50 5 1.5 \
-      --out pruned/IBS/IBS.chr"${chr}".phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes
-
-    plink --noweb \
-      --bfile raw/IBS.chr"${chr}".phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes \
-      --extract pruned/IBS/IBS.chr"${chr}".phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.prune.in \
-      --make-bed \
-      --out pruned/IBS/IBS.chr"${chr}".phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes
-done
-
-# Get a list of all PLINK files
-cd pruned
 find . -name "*.bim" | grep -e "ALL" > ForMergeALL.list
 sed -i 's/.bim//g' ForMergeALL.list
 find . -name "*.bim" | grep -e "IBS" > ForMergeIBS.list
 sed -i 's/.bim//g' ForMergeIBS.list
 
 # Merge projects into single PLINK files
-plink --merge-list ForMergeALL.list --out ../merged/ALL
-plink --merge-list ForMergeIBS.list --out ../merged/IBS
+plink --merge-list ForMergeALL.list --out ../merged/ALL --memory 122000
+plink --merge-list ForMergeIBS.list --out ../merged/IBS --memory 122000
 
 cd ../..
 # Merge all filtered severe COVID patient VCF files
@@ -104,29 +76,36 @@ bcftools index --threads ${threads} pca/severe_covid/severe_covid_merged.bcf
 
 # Convert the BCF files to PLINK format
 cd pca/severe_covid
-plink --bcf severe_covid_merged.bcf --make-bed --out severe_covid_merged
+# plink --bcf severe_covid_merged.bcf --make-bed --out severe_covid_merged
 
 # Determine common variants between the severe COVID and 1000 Genomes and IBS datasets
 plink --bfile severe_covid_merged --bmerge ../merged/ALL --out common_variants_severe_covid_ALL --memory 122000
 plink --bfile severe_covid_merged --bmerge ../merged/IBS --out common_variants_severe_covid_IBS --memory 122000
 
 # Extract the common variants
-plink --bfile severe_covid_merged --extract common_variants_severe_covid_ALL.bim --make-bed --out ../extracted/severe_covid_extracted_ALL
-plink --bfile severe_covid_merged --extract common_variants_severe_covid_IBS.bim --make-bed --out ../extracted/severe_covid_extracted_IBS
-plink --bfile ../merged/ALL --extract common_variants_severe_covid_ALL.bim --make-bed --out ../extracted/ALL_extracted
-plink --bfile ../merged/IBS --extract common_variants_severe_covid_IBS.bim --make-bed --out ../extracted/IBS_extracted
+plink --bfile severe_covid_merged --extract common_variants_severe_covid_ALL.bim --make-bed --out ../extracted/severe_covid_extracted_ALL --memory 122000
+plink --bfile severe_covid_merged --extract common_variants_severe_covid_IBS.bim --make-bed --out ../extracted/severe_covid_extracted_IBS --memory 122000
+plink --bfile ../merged/ALL --extract common_variants_severe_covid_ALL.bim --make-bed --out ../extracted/ALL_extracted --memory 122000
+plink --bfile ../merged/IBS --extract common_variants_severe_covid_IBS.bim --make-bed --out ../extracted/IBS_extracted --memory 122000
 
 # Create common variants datasets for PCA
 cd ../extracted
-plink --bfile severe_covid_extracted_ALL --bmerge ALL_extracted --out ../1000G_pca/severe_covid_ALL_merged --memory 122000
-plink --bfile severe_covid_extracted_IBS --bmerge IBS_extracted --out ../IBS_pca/severe_covid_IBS_merged --memory 122000
+plink --bfile severe_covid_extracted_ALL --bmerge ALL_extracted --out severe_covid_ALL_merged --memory 122000
+plink --bfile severe_covid_extracted_IBS --bmerge IBS_extracted --out severe_covid_IBS_merged --memory 122000
+
+# Prune variants by MAF and VIF
+cd ..
+plink --bfile extracted/severe_covid_ALL_merged --maf 0.10 --indep 50 5 1.5 --out pruned/severe_covid_ALL_pruned --memory 122000
+plink --bfile extracted/severe_covid_ALL_merged --extract pruned/severe_covid_ALL_pruned.prune.in --make-bed --out pruned/severe_covid_ALL_pruned --memory 122000
+plink --bfile extracted/severe_covid_IBS_merged --maf 0.10 --indep 50 5 1.5 --out pruned/severe_covid_IBS_pruned --memory 122000
+plink --bfile extracted/severe_covid_IBS_merged --extract pruned/severe_covid_IBS_pruned.prune.in --make-bed --out pruned/severe_covid_IBS_pruned --memory 122000
 
 # Perform PCA
-cd ../1000G_pca
-plink --bfile severe_covid_ALL_merged --pca --memory 122000
+cd 1000G_pca
+plink --bfile ../pruned/severe_covid_ALL_pruned --pca --memory 122000
 
 cd ../IBS_pca
-plink --bfile severe_covid_IBS_merged --pca --memory 122000
+plink --bfile ../pruned/severe_covid_IBS_pruned --pca --memory 122000
 cd ../..
 
 python scripts/lib/pca.py
