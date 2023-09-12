@@ -164,13 +164,13 @@ fig, axs = pca_plot(
 # Save the 1000G PCA plot
 fig.savefig("pca/1000G_pca/1000G_PCA_plot.png", dpi=300)
 
-# Define superpopulations for the IBS plot
+# Define populations for the IBS plot
 populations_IBS = {
     "Iberian (IBS)": ["IBS"],
     "Severe COVID-19": ["Severe COVID-19"],
 }
 
-# Define colors for each superpopulation for the IBS plot
+# Define colors for each population for the IBS plot
 colors_IBS = ["#1f78b4", "#4d4d4d"]
 
 # Define color mapping for the IBS plot
