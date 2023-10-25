@@ -43,7 +43,7 @@ You'll need a working Python environment to run the code. We recommend you set u
 
 Run the following command in the main repository folder (where [`environment.yml`](environment.yml) is located) to create a conda environment and install all required dependencies in it.
 
-```
+```bash
 conda env create -f environment.yml
 conda activate glimpse
 ```
@@ -52,13 +52,13 @@ conda activate glimpse
 
 All scripts were designed to be run from the main repository folder. To reproduce the data generated in the paper, run the scripts in the following order and syntax:
 
-```
-scripts/1_setup.sh
-scripts/2_gl_calling.sh
-scripts/3_glimpse_impute_parallel.sh
-scripts/4_vcf_filtering.sh
-scripts/5_glimpse_concordance.sh
-scripts/6_pca.sh
+```bash
+bash scripts/1_setup.sh
+bash scripts/2_gl_calling.sh
+bash scripts/3_glimpse_impute_parallel.sh
+bash scripts/4_vcf_filtering.sh
+bash scripts/5_glimpse_concordance.sh
+bash scripts/6_pca.sh
 ```
 
 See the `README.md` files in the [`scripts`](scripts) directory for a full description of each script and required files.
