@@ -5,10 +5,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import spearmanr
 
-# Load the data
 df = pd.read_csv("phenostats/phenostats.csv")
 
-# Set color scheme
 colors = [
     "#1f78b4",
     "#b2df8a",
@@ -25,7 +23,6 @@ colors = [
     "#4d4d4d",
 ]
 
-# Convert 'ICU_Days' to a boolean column indicating ICU admission
 df["ICU"] = df["ICU_Days"] > 0
 df["ICU admittance"] = df["ICU"].map({True: "Admitted", False: "Not admitted"})
 
@@ -232,13 +229,11 @@ sns.set_style("ticks")
 phenotype_df = df.loc[:, "V-1":"V-28"].applymap(lambda x: 1 if x == "YES" else 0)
 correlation_matrix, p_values = spearmanr(phenotype_df)
 
-# Create a mask for the upper triangle to hide repeated values
 mask = np.triu(np.ones_like(correlation_matrix, dtype=bool))
 
-# Set the significance level (alpha)
+# Significance level (alpha)
 alpha = 0.05
 
-# Create a new correlation matrix with empty values for non-significant correlations
 annot_matrix = np.where(p_values < alpha, correlation_matrix.round(2).astype(str), "")
 
 plt.figure(figsize=(16, 12))
@@ -246,11 +241,11 @@ sns.heatmap(
     correlation_matrix,
     cmap="coolwarm",
     center=0,
-    annot=annot_matrix,  # Use the annot_matrix for annotations
-    fmt="",  # Empty format to display only color
+    annot=annot_matrix,
+    fmt="",
     xticklabels=phenotype_labels,
     yticklabels=phenotype_labels,
-    mask=mask,  # Apply the mask to hide the upper triangle
+    mask=mask,
     cbar_kws={"label": "Spearman Correlation Coefficient"},
 )
 
@@ -259,28 +254,3 @@ plt.xticks(rotation=90)
 plt.yticks(rotation=0)
 plt.tight_layout()
 plt.savefig("phenostats/plot_3.png", dpi=300)
-
-# Plot 4: Distribution of SNPs
-file_path = "filtered_vcf/snps.txt"
-with open(file_path, "r") as file:
-    sample_lines = [file.readline().strip() for _ in range(10)]
-
-sample_ids = []
-number_of_snps = []
-
-with open(file_path, "r") as file:
-    for i in range(79):
-        line = file.readline().strip()
-        sample_id = line.split("/")[1].split(".")[0]
-        snps = int(line.split(": ")[-1])
-        sample_ids.append(sample_id)
-        number_of_snps.append(snps)
-
-sns.set_style("whitegrid")
-plt.figure(figsize=(12, 5))
-sns.barplot(x=sample_ids, y=[snps / 1e6 for snps in number_of_snps], color="#1f78b4")
-plt.xticks(rotation=90)
-plt.xlabel("Sample ID")
-plt.ylabel("Number of SNVs (in millions)")
-plt.tight_layout()
-plt.savefig("filtered_vcf/plot_4.png", dpi=300)

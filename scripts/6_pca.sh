@@ -76,7 +76,7 @@ bcftools index --threads ${threads} pca/severe_covid/severe_covid_merged.bcf
 
 # Convert the BCF files to PLINK format
 cd pca/severe_covid
-# plink --bcf severe_covid_merged.bcf --make-bed --out severe_covid_merged
+plink --bcf severe_covid_merged.bcf --make-bed --out severe_covid_merged
 
 # Determine common variants between the severe COVID and 1000 Genomes and IBS datasets
 plink --bfile severe_covid_merged --bmerge ../merged/ALL --out common_variants_severe_covid_ALL --memory 122000
