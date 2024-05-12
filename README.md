@@ -18,12 +18,9 @@ We generated an imputed dataset of 79 variant call format (VCF) patient files us
 
 This dataset highlights the utility and accuracy of low-coverage whole genome sequencing imputation in the study of COVID-19 severity, setting a precedent for other applications in resource-constrained environments linked to comprehensive analyses of genetic components for various complex diseases. The methods and findings presented here may be leveraged in future genomic projects, providing vital insights for health challenges like COVID-19.
 
-![Principal component analysis of genetic variation in the severe COVID-19 patient cohort against the 1000 Genomes Project global superpopulations ](pca/1000G_pca/1000G_PCA_plot.png)
-_Projection of imputed low-coverage whole-genome sequencing (lcWGS) data from severe COVID-19 patients against the backdrop of global superpopulations from the 1000 Genomes Project. Each point represents an individual, colour-coded according to their superpopulation. Severe COVID-19 patients are distinguished by points with a white fill and coloured border. The x-axis and y-axis on the two subplots represent the first and second, and first and third principal components, respectively, with the percentage of variance explained by each component indicated in the axis label._
-
 # Software implementation
 
-All the source code used to generate the results and figures in the paper are in the [`scripts`](scripts) folder. See the `README.md` files in each directory for a full description.
+All the source code used to generate the results and figures in the paper are in the [`scripts`](scripts) folder. See the `README.md` files in each directory for a full description of each figure.
 
 # Setup
 
@@ -47,6 +44,10 @@ Run the following command in the main repository folder (where [`environment.yml
 conda env create -f environment.yml
 conda activate glimpse
 ```
+## Input data requirements
+The data required as input for this pipeline consists of .cram [case](https://ega-archive.org/studies/EGAS00001007573) and [validation](https://doi.org/10.25452/figshare.plus.21651584) files, stored inside a directory named `bam`.
+
+The 1000 Genomes reference panel will be retrieved and set up by the [`1_setup.sh`](scripts\1_setup.sh) script.
 
 ## Running the code
 

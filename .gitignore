@@ -17,4 +17,3 @@ filtered_vcf/*.txt
 GLIMPSE_imputed/
 GLIMPSE_ligated/
 imputed_vcf/
-maps/
